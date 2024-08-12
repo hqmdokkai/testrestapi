@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h2>Nhập tên và đặc điểm của bạn</h2>
+    <form id="dataForm">
+      <input type="text" id="name" name="name" placeholder="Tên" required />
+      <input type="text" id="attribute" name="attribute" placeholder="Đặc điểm" required />
+      <button type="submit">Thêm Dữ Liệu</button>
+    </form>
+
+    <div id="error-message"></div>
+
+    <h2>Danh sách người dùng</h2>
+    <table id="dataTable" border="1">
+      <thead>
+        <tr>
+          <th>Tên</th>
+          <th>Đặc điểm</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- Dữ liệu sẽ được nạp vào đây bằng JavaScript -->
+      </tbody>
+    </table>
+
+    <script>
+      const apiUrl = 'http://serverrestapi.infinityfreeapp.com/index.php'; // Thay bằng URL của server PHP
+
+      // Load dữ liệu người dùng khi trang được tải
+      window.onload = function() {
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(users => {
+            const userTableBody = document.getElementById('userTableBody');
+            userTableBody.innerHTML = '';
+            users.forEach((user, index) => {
+              userTableBody.innerHTML += `
+                <tr>
+                  <td>${user.name}</td>
+                  <td>${user.attribute}</td>
+                  <td><button onclick="deleteUser(${index})">Xóa</button></td>
+                </tr>
+              `;
+            });
+          });
+      };
+
+      // Xử lý form submit
+      document.getElementById('dataForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+        const attribute = document.getElementById('attribute').value;
+
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            name: name,
+            attribute: attribute
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            window.location.reload();
+          } else {
+            document.getElementById('error-message').textContent = data.message;
+          }
+        });
+      });
+
+      // Xóa người dùng
+      function deleteUser(index) {
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            deleteIndex: index
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            window.location.reload();
+          } else {
+            document.getElementById('error-message').textContent = data.message;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
