@@ -1,60 +1,57 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  </head>
+  <body>
     <h2>Nhập tên và đặc điểm của bạn</h2>
-    <form id="dataForm" method="POST">
-        <input type="text" id="name" name="name" placeholder="Tên" required />
-        <input type="text" id="attribute" name="attribute" placeholder="Đặc điểm" required />
-        <button type="submit">Thêm Dữ Liệu</button>
+    <form id="dataForm" method="post" action="https://serverrestapi.infinityfreeapp.com/index.php">
+      <input type="text" id="name" name="name" placeholder="Tên" required />
+      <input type="text" id="attribute" name="attribute" placeholder="Đặc điểm" required />
+      <button type="submit">Thêm Dữ Liệu</button>
     </form>
 
     <div id="error-message"></div>
 
     <h2>Danh sách người dùng</h2>
     <table id="dataTable" border="1">
-        <thead>
-            <tr>
-                <th>Tên</th>
-                <th>Đặc điểm</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody id="userTableBody">
-            <!-- Dữ liệu sẽ được nạp vào đây -->
-        </tbody>
+      <thead>
+        <tr>
+          <th>Tên</th>
+          <th>Đặc điểm</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- Dữ liệu sẽ được nạp vào đây bằng PHP -->
+      </tbody>
     </table>
 
     <script>
-      const apiUrl = 'https://serverrestapi.infinityfreeapp.com/index.php';
+      // Xóa người dùng bằng cách gửi form POST tới PHP
+      function deleteUser(index) {
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = 'https://serverrestapi.infinityfreeapp.com/index.php';
 
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'deleteIndex';
+        input.value = index;
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+
+      // Chờ trang tải xong để nạp dữ liệu người dùng
       window.onload = function() {
-        fetch(apiUrl)
-          .then(response => response.json())
-          .then(users => {
-            const userTableBody = document.getElementById('userTableBody');
-            userTableBody.innerHTML = '';
-            users.forEach((user, index) => {
-              userTableBody.innerHTML += `
-                <tr>
-                  <td>${user.name}</td>
-                  <td>${user.attribute}</td>
-                  <td>
-                    <form method="POST" action="${apiUrl}" style="display: inline;">
-                      <input type="hidden" name="deleteIndex" value="${index}">
-                      <button type="submit">Xóa</button>
-                    </form>
-                  </td>
-                </tr>
-              `;
-            });
-          });
+        // Đây là cách đơn giản để nạp dữ liệu người dùng bằng PHP
+        // PHP có thể tạo ra nội dung HTML trực tiếp
       };
     </script>
-</body>
+  </body>
 </html>
